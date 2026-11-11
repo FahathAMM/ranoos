@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
+/* Modernist palette: paper, ink, one signal colour */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f1eee6;
+  --surface: #e8e4d9;
+  --foreground: #0e0e0c;
+  --muted: #6b675e;
+  --border: #0e0e0c1f;
+  --brand: #0e0e0c;
+  --accent: #ff4a1c;
+  --ink: #0e0e0c;
+  --paper: #f1eee6;
+  /* "only" stops Chrome/Edge "force dark mode" from re-darkening the light theme */
+  color-scheme: only light;
+}
+
+/* Dark: chosen explicitly, or following the device when no choice is stored */
+:root[data-theme="dark"] {
+  --background: #0e0e0c;
+  --surface: #171714;
+  --foreground: #f1eee6;
+  --muted: #9a958a;
+  --border: #f1eee61f;
+  --brand: #f1eee6;
+  --accent: #ff5a2e;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0e0e0c;
+    --surface: #171714;
+    --foreground: #f1eee6;
+    --muted: #9a958a;
+    --border: #f1eee61f;
+    --brand: #f1eee6;
+    --accent: #ff5a2e;
+    color-scheme: dark;
+  }
+}
+
+/* Theme switch: circular reveal via the View Transitions API */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --font-sans: var(--font-inter-tight);
+  --font-display: var(--font-inter-tight);
+  --font-mono: var(--font-jetbrains);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+/* Fine grain overlay for a printed-paper feel */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Swiss grid lines */
+.grid-lines {
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--foreground);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 40s linear infinite; }
+.animate-marquee-reverse { animation: marquee 50s linear infinite reverse; }
+
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.animate-spin-slow { animation: spin-slow 18s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee, .animate-marquee-reverse, .animate-spin-slow { animation: none; }
+  html { scroll-behavior: auto; }
 }
